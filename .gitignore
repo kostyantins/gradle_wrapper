@@ -286,6 +286,7 @@ buildNumber.properties
 #
 .txt
 .allure
+.allure/allure-2.10.0
 allure-results
 
 .idea
