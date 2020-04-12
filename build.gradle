@@ -1,0 +1,76 @@
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'io.qameta.allure'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'org.testng', name: 'testng', version: '7.1.0'
+    compile group: 'com.codeborne', name: 'selenide', version: '5.10.0'
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
+    compile group: 'org.aeonbits.owner', name: 'owner', version: '1.0.10'
+    compile group: 'io.qameta.allure', name: 'allure-rest-assured', version: '2.13.2'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'io.qameta.allure:allure-gradle:2.8.1'
+    }
+}
+
+allure {
+    version = '2.10.0'
+    autoconfigure = true
+    aspectjweaver = true
+    allureJavaVersion = '2.13.2'
+    downloadLinkFormat = 'https://dl.bintray.com/qameta/maven/io/qameta/allure/allure-commandline/%s/allure-commandline-%<s.zip'
+}
+
+tasks.withType(Test) {
+    systemProperty 'allure.link.tms.pattern', 'https://www.google.com/'
+    systemProperty 'allure.link.issue.pattern', 'https://www.wikipedia.org'
+    systemProperty 'allure.link.mylink.pattern', 'https://example.org/mylink/{}'
+
+    //to forbidden .txt generation by AspectJ
+    systemProperty 'org.aspectj.weaver.Dump.exception', 'false'
+
+    systemProperties project.properties.subMap(["env", "suite"])
+}
+
+//en example, usage: gradle task
+task uiTests(type: Test) {
+    useTestNG() {
+        suites String.format('src/test/resources/suites/ui.xml')
+        ignoreFailures = true
+    }
+}
+
+task apiTests(type: Test) {
+    useTestNG() {
+        suites String.format('src/test/resources/suites/api.xml')
+        ignoreFailures = true
+    }
+}
+
+//en example, usage: gradle lifecycle step test
+test {
+    useTestNG()
+    ignoreFailures = true
+}
+
+wrapper {
+    gradleVersion = '5.6.2'
+    distributionUrl = distributionUrl.replace("bin", "all")
+}
