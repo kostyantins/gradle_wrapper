@@ -285,4 +285,8 @@ buildNumber.properties
 
 #
 .txt
+.allure
+allure-results
 
+.idea
+build
